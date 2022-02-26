@@ -4,28 +4,28 @@ class AjedrezJuego {
 
       // variables
       // public String[][] tablero = {
-      //             { "0", "1", "2", "3", "4", "5", "6", "7", "8" },
-      //             { "1", "BT", "BP", "0", "0", "0", "0", "NP", "NT" }, // X = 1
-      //             { "2", "BC", "BP", "0", "0", "0", "0", "NP", "NC" }, // X = 2
-      //             { "3", "BA", "BP", "0", "0", "0", "0", "NP", "NA" }, // X = 3
-      //             { "4", "BK", "BP", "0", "0", "0", "0", "NP", "NQ" }, // X = 4
-      //             { "5", "BQ", "BP", "0", "0", "0", "0", "NP", "NK" }, // X = 5
-      //             { "6", "BA", "BP", "0", "0", "0", "0", "NP", "NA" }, // X = 6
-      //             { "7", "BC", "BP", "0", "0", "0", "0", "NP", "NC" }, // X = 7
-      //             { "8", "BT", "BP", "0", "0", "0", "0", "NP", "NT" } // X = 8
+      // { "0", "1", "2", "3", "4", "5", "6", "7", "8" },
+      // { "1", "BT", "BP", "0", "0", "0", "0", "NP", "NT" }, // X = 1
+      // { "2", "BC", "BP", "0", "0", "0", "0", "NP", "NC" }, // X = 2
+      // { "3", "BA", "BP", "0", "0", "0", "0", "NP", "NA" }, // X = 3
+      // { "4", "BK", "BP", "0", "0", "0", "0", "NP", "NQ" }, // X = 4
+      // { "5", "BQ", "BP", "0", "0", "0", "0", "NP", "NK" }, // X = 5
+      // { "6", "BA", "BP", "0", "0", "0", "0", "NP", "NA" }, // X = 6
+      // { "7", "BC", "BP", "0", "0", "0", "0", "NP", "NC" }, // X = 7
+      // { "8", "BT", "BP", "0", "0", "0", "0", "NP", "NT" } // X = 8
       // };
 
       public String[][] tablero = {
-            { "0", "1", "2", "3", "4", "5", "6", "7", "8" },
-            { "1", "BT", "BP", "0", "0", "0", "0", "NP", "NT" }, // X = 1
-            { "2", "0", "BP", "0", "0", "0", "0", "NP", "NC" }, // X = 2
-            { "3", "0", "BP", "0", "0", "0", "0", "NP", "NA" }, // X = 3
-            { "4", "0", "BP", "0", "0", "0", "0", "NP", "NQ" }, // X = 4
-            { "5", "0", "BP", "0", "0", "0", "0", "NP", "NK" }, // X = 5
-            { "6", "0", "BP", "0", "0", "0", "0", "NP", "NA" }, // X = 6
-            { "7", "0", "BP", "0", "0", "0", "BK", "NP", "NC" }, // X = 7
-            { "8", "BT", "BP", "0", "0", "0", "0", "0", "NT" } // X = 8
-};
+                  { "0", "1", "2", "3", "4", "5", "6", "7", "8" },
+                  { "1", "BT", "BP", "0", "0", "0", "0", "NP", "NT" }, // X = 1
+                  { "2", "0", "BP", "0", "0", "0", "0", "NP", "NC" }, // X = 2
+                  { "3", "0", "BP", "0", "0", "0", "0", "NP", "NA" }, // X = 3
+                  { "4", "0", "BP", "0", "0", "0", "0", "NP", "NQ" }, // X = 4
+                  { "5", "0", "BP", "0", "0", "0", "0", "NP", "NK" }, // X = 5
+                  { "6", "0", "BP", "0", "0", "0", "0", "NP", "NA" }, // X = 6
+                  { "7", "0", "BP", "0", "0", "0", "BK", "NP", "NC" }, // X = 7
+                  { "8", "BT", "BP", "0", "0", "0", "0", "0", "NT" } // X = 8
+      };
 
       public boolean turno_jugador = true; // true: blanco false: negro
       public char color_jugador = 'B'; // 'B': blanco 'N': negro
@@ -45,11 +45,8 @@ class AjedrezJuego {
 
       public int puntos_blanco = 0; // puntos que ha tenido el blanco por eliminacion
       public int puntos_negro = 0; // puntos que ha tenido el negro por eliminacion
-
-      public String[] piezas_eliminadas_blanco = { "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0",
-                  "0", "0" };
-      public String[] piezas_eliminadas_negro = { "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0",
-                  "0", "0" };
+      public String[] piezas_eliminadas_blanco = { "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0" };
+      public String[] piezas_eliminadas_negro = { "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0" };
       public int n_eliminado_blanco = 0;
       public int n_eliminado_negro = 0;
 
@@ -59,7 +56,6 @@ class AjedrezJuego {
       public boolean movido_rey_negro = false;
       public boolean movido_torre_negro_izq = false;
       public boolean movido_torre_negro_der = false;
-
       public int[] posicion_rey_blanco_inicio = { 4, 1 };
       public int[] posicion_rey_negro_inicio = { 5, 8 };
 
@@ -144,14 +140,13 @@ class AjedrezJuego {
                         turno_jugador = false;
                         color_jugador = 'N';
                         color_enemigo = 'B';
+                        // 这里判断是否将死或和棋， 如果是，juego_acabado = true
                   } else {
                         turnoNegro();
                         turno_jugador = true;
                         color_jugador = 'B';
                         color_enemigo = 'N';
-                  }
-                  if (endGame() == true) {
-                        juego_acabado = true;
+                        // 这里判断是否将死或和棋， 如果是，juego_acabado = true
                   }
             }
       }
@@ -179,6 +174,11 @@ class AjedrezJuego {
                   // el usuario introduce la pieza que quiere mover
                   posicion_movimiento_anterior = introducirPosicion("Quiero mover(x y): ");
 
+                  // si el usuario ha introducido "abandono", salir del movimiento
+                  if (juego_acabado == true) {
+                        break;
+                  }
+
                   // si la pieza no es suya, continue
                   if (esSuPieza(posicion_movimiento_anterior) == false) {
                         System.out.println("No es tu pieza");
@@ -188,10 +188,17 @@ class AjedrezJuego {
                   // el usuario introduce la casilla_destino
                   posicion_movimiento_posterior = introducirPosicion("A la casilla(x y): ");
 
+                  // si el usuario ha introducido "abandono", salir del movimiento
+                  if (juego_acabado == true) {
+                        break;
+                  }
+
                   // si se puede mover
-                  if (esSuPieza(posicion_movimiento_posterior) == false
-                              && puedeMover(posicion_movimiento_anterior, posicion_movimiento_posterior, false) == true) {
+                  if (esSuPieza(posicion_movimiento_posterior) == false && puedeMover(posicion_movimiento_anterior,
+                              posicion_movimiento_posterior, false) == true) {
+                        // mover la pieza
                         moverPieza();
+
                         // coronacion del peon
                         if (puedeCoronarPeon() == true) {
                               mostrarOpcionConoracion();
@@ -251,7 +258,8 @@ class AjedrezJuego {
                         break;
             }
 
-            // cuando la funcion puedeMover() esta ejecutado dentro de la funcion jaque(), no hace falta ejecutar jaque otra vez
+            // cuando la funcion puedeMover() esta ejecutado dentro de la funcion jaque(),
+            // no hace falta ejecutar jaque otra vez
             // sino se producira un bucle infinito
             if (comprobacion_jaque == false) {
                   resultado = !jaque(color_enemigo, color_jugador, posicion_despues);
@@ -432,7 +440,7 @@ class AjedrezJuego {
             boolean resultado = false;
             int distancia_x = posicion_despues[X] - posicion_antes[X];
             int distancia_y = posicion_despues[Y] - posicion_antes[Y];
- 
+
             // en caso de enroque
             if ((distancia_x == 2 || distancia_x == -2) && distancia_y == 0) {
                   int[] posicion_rey = new int[2];
@@ -462,7 +470,7 @@ class AjedrezJuego {
                         }
                   }
                   // negro
-                  else { 
+                  else {
                         posicion_rey[X] = 5;
                         posicion_rey[Y] = 8;
                         // a la derehca
@@ -664,8 +672,7 @@ class AjedrezJuego {
 
             if (color_jugador == 'B') {
                   color_jugador_a = 'N';
-            }
-            else {
+            } else {
                   color_jugador_a = 'B';
             }
 
@@ -678,13 +685,13 @@ class AjedrezJuego {
             }
 
             for (int i = 0; i != for_final; i += for_direccion) {
-                  int[] posicion_virtual_rey = {posicion_rey_blanco_inicio[X] + i, posicion_rey_blanco_inicio[Y]};
+                  int[] posicion_virtual_rey = { posicion_rey_blanco_inicio[X] + i, posicion_rey_blanco_inicio[Y] };
                   if (jaque(color_jugador_a, color_jugador, posicion_virtual_rey)) {
                         resultado = false;
                         break;
                   }
             }
-            
+
             return resultado;
       }
 
@@ -696,8 +703,44 @@ class AjedrezJuego {
       // end game
       public boolean endGame() {
             boolean resultado = false;
+            if (empate() == true || abandonoPartida() == true || jaqueMate() == true) {
+                  resultado = true;
+            }
+            return resultado;
+      }
+
+      public boolean abandonoPartida() {
+            boolean resultado = false;
 
             return resultado;
+      }
+
+      public boolean jaqueMate() {
+            boolean resultado = false;
+
+            return resultado;
+
+      }
+
+      public boolean empate() {
+            boolean resultado = false;
+            if (empateAhogado() == true || empateMuerto() == true) {
+                  resultado = true;
+            }
+            return resultado;
+      }
+
+      public boolean empateAhogado() {
+            boolean resultado = false;
+
+            return resultado;
+      }
+
+      public boolean empateMuerto() {
+            boolean resultado = false;
+
+            return resultado;
+
       }
 
       // funciones auxiliares
@@ -736,8 +779,14 @@ class AjedrezJuego {
                               input.nextLine();
                         }
                   } else {
-                        System.out.println("Entrada Invalida3");
-                        input.nextLine();
+                        if (input.next().equals("abandono")) {
+                              juego_acabado = true;
+                              break;
+                        }
+                        else {
+                              System.out.println("Entrada Invalida3");
+                              input.nextLine();      
+                        }
                   }
             }
             return posicion;
@@ -764,14 +813,15 @@ class AjedrezJuego {
       }
 
       public boolean jaque(char color_jugador_a, char color_jugador_b, int[] posicion_rey_b) {
-            // jugador_b esta en jaque (una pieza de jugador_a puede matar el rey de jugador_b)
+            // jugador_b esta en jaque (una pieza de jugador_a puede matar el rey de
+            // jugador_b)
             // comprobar si el jugador ------jaque-----> el enemigo
             boolean resultado = false;
             boolean break_hecho = false;
             for (int i = 1; i <= 8; i++) {
                   for (int j = 1; j <= 8; j++) {
                         if (tablero[i][j].charAt(0) == color_jugador_a) {
-                              int[] posicion_pieza_a = {i, j};
+                              int[] posicion_pieza_a = { i, j };
                               if (puedeMover(posicion_pieza_a, posicion_rey_b, true)) {
                                     resultado = true;
                                     break_hecho = true;
@@ -825,7 +875,7 @@ class AjedrezJuego {
                   } else {
                         puntos_blanco -= p;
                   }
-            // en caso normal
+                  // en caso normal
             } else {
                   if (turno_jugador == true) {
                         puntos_blanco += p;
