@@ -5,14 +5,14 @@ class AjedrezJuego {
       // variables
       public String[][] tablero = {
       { "0", "1", "2", "3", "4", "5", "6", "7", "8" },
-      { "1", "BT", "BP", "0", "0", "0", "0", "NP", "NT" }, // X = 1
-      { "2", "BC", "BP", "0", "0", "0", "0", "NP", "NC" }, // X = 2
-      { "3", "BA", "BP", "0", "0", "0", "0", "NP", "NA" }, // X = 3
-      { "4", "BK", "BP", "0", "0", "0", "0", "NP", "NQ" }, // X = 4
-      { "5", "BQ", "BP", "0", "0", "0", "0", "NP", "NK" }, // X = 5
-      { "6", "BA", "BP", "0", "0", "0", "0", "NP", "NA" }, // X = 6
-      { "7", "BC", "BP", "0", "0", "0", "0", "NP", "NC" }, // X = 7
-      { "8", "BT", "BP", "0", "0", "0", "0", "NP", "NT" } // X = 8
+      { "a", "BT", "BP", "0", "0", "0", "0", "NP", "NT" }, // X = 1
+      { "b", "BC", "BP", "0", "0", "0", "0", "NP", "NC" }, // X = 2
+      { "c", "BA", "BP", "0", "0", "0", "0", "NP", "NA" }, // X = 3
+      { "d", "BK", "BP", "0", "0", "0", "0", "NP", "NQ" }, // X = 4
+      { "e", "BQ", "BP", "0", "0", "0", "0", "NP", "NK" }, // X = 5
+      { "f", "BA", "BP", "0", "0", "0", "0", "NP", "NA" }, // X = 6
+      { "g", "BC", "BP", "0", "0", "0", "0", "NP", "NC" }, // X = 7
+      { "h", "BT", "BP", "0", "0", "0", "0", "NP", "NT" } // X = 8
       };
 
       public String[][] tablero_virtual = new String[9][9];
@@ -20,9 +20,12 @@ class AjedrezJuego {
       public final int X = 0; // posicion[0]: X
       public final int Y = 1; // posicion[1]: Y
 
+      public int n_turno = 1;
       public boolean turno_jugador = true; // true: blanco false: negro
       public char color_jugador = 'B'; // 'B': blanco 'N': negro
       public char color_enemigo = 'N'; // 'B': blanco 'N': negro
+      public String nombre_blanco = "BLANCO";
+      public String nombre_negro = "NEGRO";
       public int[] posicion_rey_jugador = { 4, 1 }; 
       public int[] posicion_rey_blanco_actual = { 4, 1 }; // posicion de rey blanco
       public int[] posicion_rey_negro_actual = { 5, 8 }; // posicion de rey negro
@@ -47,68 +50,144 @@ class AjedrezJuego {
       public boolean movido_torre_negro_izq = false;
       public boolean movido_torre_negro_der = false;
 
+      public boolean en_jaque_blanco = false;
+      public boolean en_jaque_negro = false;
+
+      public String mensaje_accion;
+      public String mensaje_pieza_movido;
+      public String mensaje_pieza_matado;
+      public int[] mensaje_casilla_antes = { -48, 0 }; // (char)(-48+96) == '0'
+      public int[] mensaje_casilla_despues = { -48, 0 };
+      public int mensaje_puntos;
+      public String mensaje_aviso_blanco = "";
+      public String mensaje_aviso_negro = "";
+
       public boolean juego_acabado = false;
       int resultado_partida; //1: blanco gana  0: empate  -1: negro gana
 
-      // print por pantalla
-      public void mostrarPorPantalla() {
-            System.out.println();
-            mostrarEstado();
-            mostrarPuntoYPiezasEliminadas();
-            mostrarTableroBlanco();
-      }
 
-      public void mostrarTableroBlanco() {
+      // mostrar por pantalla
+      public void mostrarTablero() {
             System.out.println();
             if (turno_jugador == true) {
-                  System.out.println("Y                  BLANCO");
+                  System.out.println("                   " + nombre_blanco);
             } else {
-                  System.out.println("Y                  NEGRO");
+                  System.out.println("                   " + nombre_negro);
             }
-            for (int y = 8; y > 0; y--) {
+
+            if (turno_jugador == true) {
+                  System.out.println("Y    a    b    c    d    e    f    g    h");
+            }
+            else {
+                  System.out.println("Y    h    g    f    e    d    c    b    a");
+            }
+
+            int y_cambio = -1;
+            int x_cambio = 1;
+
+            for (int y = 8; y >= 1; y += y_cambio) {
                   System.out.println("  +----+----+----+----+----+----+----+----+");
-                  for (int x = 0; x <= 8; x++) {
-                        if (tablero[x][y] == "0") {
-                              System.out.print("  ");
-                        } else {
-                              System.out.print(tablero[x][y]);
+
+                  if (turno_jugador == true) {
+                        System.out.print(y);
+                  }
+                  else {
+                        System.out.print(9 - y);
+                  }
+
+                  System.out.print(" | ");
+
+                  for (int x = 1; x <= 8; x += x_cambio) {
+                        // tablero de blanco
+                        if (turno_jugador == true) {
+                              if (tablero[x][y] == "0") {
+                                    System.out.print("  ");
+                              }
+                              else {
+                                    System.out.print(tablero[x][y]);
+                              }
+                        }
+                        // tablero de negro
+                        else {
+                              if (tablero[9 - x][9 - y] == "0") {
+                                    System.out.print("  ");
+                              }
+                              else {
+                                    System.out.print(tablero[9 - x][9 - y]);
+                              }
                         }
                         System.out.print(" | ");
+                  }
+
+                  if (turno_jugador == true) {
+                        System.out.print(y);
+                  }
+                  else {
+                        System.out.print(9 - y);
+                  }
+
+                  System.out.print("      ");
+                  
+                  // mostrar mensajes (turno, puntos, felicidad...)
+                  if (y == 8) {
+                        System.out.print("TURNO: " + n_turno);
+                  }
+                  if (y == 7) {
+                        if (turno_jugador == true) {
+                              System.out.print("Tienes " + puntos_blanco + " puntos y has eliminado: ");
+                              for (int i = 0; i < 16; i++) {
+                                    if (piezas_eliminadas_negro[i] != "0") {
+                                          System.out.print(piezas_eliminadas_negro[i] + " ");
+                                    } else {
+                                          break;
+                                    }
+                              }
+                        } else {
+                              System.out.print("Tienes " + puntos_negro + " puntos y has eliminado: ");
+                              for (int i = 0; i < 16; i++) {
+                                    if (piezas_eliminadas_blanco[i] != "0") {
+                                          System.out.print(piezas_eliminadas_blanco[i] + " ");
+                                    } else {
+                                          break;
+                                    }
+                              }
+                        }
+                  }
+                  if (y == 6) {
+                        System.out.print("Introducir \"abandono\" para rendirse");
+                  }
+                  if (y == 5) {
+                        System.out.print("Ultimo paso:");
+                  }
+                  if (y == 4) {
+                        System.out.print("    ");
+                        System.out.print(mensaje_accion + ": ");
+                        System.out.print(mensaje_pieza_movido + "(" + (char)(mensaje_casilla_antes[X] + 96) + "," + mensaje_casilla_antes[Y] + ")");
+                        System.out.print(" --> ");
+                        System.out.print(mensaje_pieza_matado + "(" + (char)(mensaje_casilla_despues[X] + 96) + "," + mensaje_casilla_despues[Y] + ")");
+                  }
+                  if (mensaje_puntos != 0 && y == 3) {
+                        System.out.print("    ");
+                        System.out.print("obtener " + mensaje_puntos + " punto");
+                        if (mensaje_puntos > 1) {
+                              System.out.print("s");
+                        }
+                  }
+                  if (y == 2) {
+                        System.out.print(mensaje_aviso_blanco);
+                  }
+                  if (y == 1) {
+                        System.out.print(mensaje_aviso_negro);
                   }
                   System.out.println();
             }
             System.out.println("  +----+----+----+----+----+----+----+----+");
-            System.out.println("     1    2    3    4    5    6    7    8    X");
-      }
-
-      public void mostrarTableroNegro() {
-
-      }
-
-      public void mostrarPuntoYPiezasEliminadas() {
             if (turno_jugador == true) {
-                  System.out.print("Tienes " + puntos_blanco + " puntos y has eliminado: ");
-                  for (int i = 0; i < 16; i++) {
-                        if (piezas_eliminadas_negro[i] != "0") {
-                              System.out.print(piezas_eliminadas_negro[i] + " ");
-                        } else {
-                              break;
-                        }
-                  }
-            } else {
-                  System.out.print("Tienes " + puntos_negro + " puntos y has eliminado: ");
-                  for (int i = 0; i < 16; i++) {
-                        if (piezas_eliminadas_blanco[i] != "0") {
-                              System.out.print(piezas_eliminadas_blanco[i] + " ");
-                        } else {
-                              break;
-                        }
-                  }
+                  System.out.println("     a    b    c    d    e    f    g    h    X");
             }
-      }
-
-      public void mostrarEstado() {
-
+            else {
+                  System.out.println("     h    g    f    e    d    c    b    a    X");
+            }
       }
 
       public void mostrarOpcionConoracion() {
@@ -116,6 +195,53 @@ class AjedrezJuego {
             System.out.println("Q:Queen    T:Torre    A:Alfil    C:Caballo");
       }
 
+      public void mostrarMensajeTermino() {
+            int longitud_nombre = 0; // longitud de nombre del jugador ganado
+            if (resultado_partida == 1) {
+                  longitud_nombre = nombre_blanco.length();
+            } else if (resultado_partida == -1) {
+                  longitud_nombre = nombre_negro.length();
+            }
+
+            System.out.println();
+
+            // linia 1
+            System.out.print("+------------------------");
+            for (int i = 1; i <= longitud_nombre; i++) {
+                  System.out.print("-");
+            }
+            System.out.print("+\n");
+
+            // linia 2
+            if (resultado_partida != 0) {
+                  System.out.print("|      ");
+                  for (int i = 1; i <= longitud_nombre / 2; i++) {
+                        System.out.print(" ");
+                  }
+                  System.out.print("FELICIDADES!");
+                  for (int i = 1; i <= longitud_nombre - longitud_nombre / 2; i++) {
+                        System.out.print(" ");
+                  }
+                  System.out.println("      |");      
+            }
+
+            // linia 3
+            if (resultado_partida == 1) {
+                  System.out.println("| El jugador " + nombre_blanco + " ha ganado! |");
+            } else if (resultado_partida == -1) {
+                  System.out.println("| El jugador " + nombre_negro + " ha ganado! |");
+            } else {
+                  System.out.println("|         EMPATE         |");
+            }
+
+            // linia 4
+            System.out.print("+------------------------");
+            for (int i = 1; i <= longitud_nombre; i++) {
+                  System.out.print("-");
+            }
+            System.out.print("+\n\n");
+      }
+      
       // main
       public static void main(String[] args) {
             AjedrezJuego programa = new AjedrezJuego();
@@ -124,8 +250,8 @@ class AjedrezJuego {
 
       // game play
       public void gamePlay() {
+            // bucle de turno (blanco -> negro -> blanco -> ...)
             while (juego_acabado == false) {
-                  mostrarPorPantalla();
                   if (turno_jugador == true) {
                         turnoBlanco();
                         turno_jugador = false;
@@ -145,16 +271,51 @@ class AjedrezJuego {
                         juego_acabado = true;
                   }
             }
+
+            // Cuando el juego ha acabado, mostrar los mensajes
+            mostrarMensajeTermino();
       }
 
       // turno de blanco
       public void turnoBlanco() {
+            // si el jugador blanco esta en jaque:
+            if (jaque(color_enemigo, color_jugador, posicion_rey_blanco_actual, tablero)) {
+                  en_jaque_blanco = true;
+                  mensaje_aviso_blanco = (nombre_blanco + ", estas en jaque!");
+            }
+
+            mostrarTablero();
+            mensaje_aviso_blanco = "";
+            mensaje_aviso_negro = "";
+            n_turno++;
             movimiento();
+
+            // si el jugador blanco estaba en jaque: 
+            if (juego_acabado == false && en_jaque_blanco == true) {
+                  mensaje_aviso_blanco = (nombre_blanco + ", estas salvado!");
+                  en_jaque_blanco = false;
+            }
       }
 
       // turno de negro
       public void turnoNegro() {
+            // si el jugador negro esta en jaque:
+            if (jaque(color_enemigo, color_jugador, posicion_rey_negro_actual, tablero)) {
+                  en_jaque_negro = true;
+                  mensaje_aviso_negro = (nombre_negro + ", estas en jaque!");
+            }
+
+            mostrarTablero();
+            mensaje_aviso_blanco = "";
+            mensaje_aviso_negro = "";
+            n_turno++;
             movimiento();
+
+            // si el jugador negro estaba en jaque:
+            if (juego_acabado == false && en_jaque_negro == true) {
+                  mensaje_aviso_negro = (nombre_negro + ", estas salvado!");
+                  en_jaque_negro = false;
+            }
       }
 
       // movimiento de jugadores (introducir - comprobar - mover)
@@ -191,21 +352,28 @@ class AjedrezJuego {
 
                   // si se puede mover
                   if (esSuPieza(posicion_movimiento_posterior, color_jugador) == false && puedeMover(posicion_movimiento_anterior,
-                              posicion_movimiento_posterior, true) == true) {
+                              posicion_movimiento_posterior, true, tablero) == true) {
+                        
+                        // guardar las informaciones en los variables de mensaje
+                        guardarInfoMensaje();
+                                    
                         // mover la pieza
                         moverPieza();
 
                         // coronacion del peon
                         if (puedeCoronarPeon() == true) {
+                              if (turno_jugador == true) {
+                                    mensaje_aviso_blanco = (nombre_blanco + ", felicidades por coronar tu peon!");
+                              }
+                              else {
+                                    mensaje_aviso_negro = (nombre_negro + ", felicidades por coronar tu peon!");
+                              }
                               mostrarOpcionConoracion();
                               coronarPeon(introducirPiezaCoronacion());
-                              actualizarPuntos(
-                                          tablero[posicion_movimiento_posterior[X]][posicion_movimiento_posterior[Y]]
-                                                      .charAt(1),
-                                          true);
+                              actualizarPuntos(tablero[posicion_movimiento_posterior[X]][posicion_movimiento_posterior[Y]].charAt(1),true);
                         }
 
-                        // guardar la posicion de rey en posicion_rey
+                        // guardar la posicion de rey en posicion_rey_actual
                         if (tablero[posicion_movimiento_posterior[X]][posicion_movimiento_posterior[Y]] == "BK") {
                               posicion_rey_blanco_actual = posicion_movimiento_posterior;
                         } else if (tablero[posicion_movimiento_posterior[X]][posicion_movimiento_posterior[Y]] == "NK") {
@@ -231,26 +399,26 @@ class AjedrezJuego {
       }
 
       // comprobacion de movimiento
-      public boolean puedeMover(int[] posicion_antes, int[] posicion_despues, boolean comprobacion_jaque) {
+      public boolean puedeMover(int[] posicion_antes, int[] posicion_despues, boolean comprobacion_jaque, String[][] tablero) {
             boolean resultado = true;
             switch (tablero[posicion_antes[X]][posicion_antes[Y]].charAt(1)) {
                   case 'P':
-                        resultado = puedeMoverPeon(posicion_antes, posicion_despues);
+                        resultado = puedeMoverPeon(posicion_antes, posicion_despues, tablero);
                         break;
                   case 'T':
-                        resultado = puedeMoverTorre(posicion_antes, posicion_despues);
+                        resultado = puedeMoverTorre(posicion_antes, posicion_despues, tablero);
                         break;
                   case 'C':
                         resultado = puedeMoverCaballo(posicion_antes, posicion_despues);
                         break;
                   case 'A':
-                        resultado = puedeMoverAlfil(posicion_antes, posicion_despues);
+                        resultado = puedeMoverAlfil(posicion_antes, posicion_despues, tablero);
                         break;
                   case 'Q':
-                        resultado = puedeMoverQueen(posicion_antes, posicion_despues);
+                        resultado = puedeMoverQueen(posicion_antes, posicion_despues, tablero);
                         break;
                   case 'K':
-                        resultado = puedeMoverKing(posicion_antes, posicion_despues);
+                        resultado = puedeMoverKing(posicion_antes, posicion_despues, tablero);
                         break;
             }
 
@@ -269,17 +437,18 @@ class AjedrezJuego {
                   // mover la pieza en tablero_virtual
                   tablero_virtual[posicion_despues[X]][posicion_despues[Y]] = tablero_virtual[posicion_antes[X]][posicion_antes[Y]];
                   tablero_virtual[posicion_antes[X]][posicion_antes[Y]] = "0";
+                  int[] posicion_rey_b_jugador_virtual = posicionPieza(color_jugador, 'K', tablero_virtual);
                   // tablero_virtual es 
-                  resultado = !jaque(color_enemigo, color_jugador, posicion_rey_jugador, tablero_virtual);
+                  resultado = !jaque(color_enemigo, color_jugador, posicion_rey_b_jugador_virtual, tablero_virtual);
             }
 
             return resultado;
       }
 
-      public boolean puedeMoverPeon(int[] posicion_antes, int[] posicion_despues) {
+      public boolean puedeMoverPeon(int[] posicion_antes, int[] posicion_despues, String[][] tablero) {
             boolean resultado = false;
             // blanco
-            if (turno_jugador == true) {
+            if (tablero[posicion_antes[X]][posicion_antes[Y]].charAt(0) == 'B') {
                   // mover
                   if (tablero[posicion_despues[X]][posicion_despues[Y]] == "0") {
                         // solo puede ir recto
@@ -345,17 +514,17 @@ class AjedrezJuego {
             return resultado;
       }
 
-      public boolean puedeMoverTorre(int[] posicion_antes, int[] posicion_despues) {
+      public boolean puedeMoverTorre(int[] posicion_antes, int[] posicion_despues, String[][] tablero) {
             boolean resultado = true;
             // vertical
             if (posicion_despues[X] == posicion_antes[X]) {
-                  if (hayAlgoMedioTorre(false, posicion_antes, posicion_despues)) {
+                  if (hayAlgoMedioTorre(false, posicion_antes, posicion_despues, tablero)) {
                         resultado = false;
                   }
             }
             // horizontal
             else if (posicion_despues[Y] == posicion_antes[Y]) {
-                  if (hayAlgoMedioTorre(true, posicion_antes, posicion_despues)) {
+                  if (hayAlgoMedioTorre(true, posicion_antes, posicion_despues, tablero)) {
                         resultado = false;
                   }
             } else {
@@ -366,29 +535,26 @@ class AjedrezJuego {
 
       public boolean puedeMoverCaballo(int[] posicion_antes, int[] posicion_despues) {
             boolean resultado = false;
-            if ((posicion_despues[X] - posicion_antes[X]) *
-                        (posicion_despues[Y] - posicion_antes[Y]) == 2
-                        || (posicion_despues[X] - posicion_antes[X]) *
-                                    (posicion_despues[Y] - posicion_antes[Y]) == -2) {
+            if ((posicion_despues[X] - posicion_antes[X]) * (posicion_despues[Y] - posicion_antes[Y]) == 2 || (posicion_despues[X] - posicion_antes[X]) * (posicion_despues[Y] - posicion_antes[Y]) == -2) {
                   resultado = true;
             }
             return resultado;
       }
 
-      public boolean puedeMoverAlfil(int[] posicion_antes, int[] posicion_despues) {
+      public boolean puedeMoverAlfil(int[] posicion_antes, int[] posicion_despues, String[][] tablero) {
             boolean resultado = true;
             // sube
             if ((posicion_despues[X]
                         - posicion_antes[X]) == (posicion_despues[Y]
                                     - posicion_antes[Y])) {
-                  if (hayAlgoMedioAlfil(true, posicion_antes, posicion_despues) == true) {
+                  if (hayAlgoMedioAlfil(true, posicion_antes, posicion_despues, tablero) == true) {
                         resultado = false;
                   }
                   // baja
             } else if ((posicion_despues[X]
                         - posicion_antes[X]) == (posicion_antes[Y]
                                     - posicion_despues[Y])) {
-                  if (hayAlgoMedioAlfil(false, posicion_antes, posicion_despues) == true) {
+                  if (hayAlgoMedioAlfil(false, posicion_antes, posicion_despues, tablero) == true) {
                         resultado = false;
                   }
             } else {
@@ -397,17 +563,17 @@ class AjedrezJuego {
             return resultado;
       }
 
-      public boolean puedeMoverQueen(int[] posicion_antes, int[] posicion_despues) {
+      public boolean puedeMoverQueen(int[] posicion_antes, int[] posicion_despues, String[][] tablero) {
             boolean resultado = true;
             // vertical
             if (posicion_despues[X] == posicion_antes[X]) {
-                  if (hayAlgoMedioTorre(false, posicion_antes, posicion_despues)) {
+                  if (hayAlgoMedioTorre(false, posicion_antes, posicion_despues, tablero)) {
                         resultado = false;
                   }
             }
             // horizontal
             else if (posicion_despues[Y] == posicion_antes[Y]) {
-                  if (hayAlgoMedioTorre(true, posicion_antes, posicion_despues)) {
+                  if (hayAlgoMedioTorre(true, posicion_antes, posicion_despues, tablero)) {
                         resultado = false;
                   }
             }
@@ -415,7 +581,7 @@ class AjedrezJuego {
             else if ((posicion_despues[X]
                         - posicion_antes[X]) == (posicion_despues[Y]
                                     - posicion_antes[Y])) {
-                  if (hayAlgoMedioAlfil(true, posicion_antes, posicion_despues) == true) {
+                  if (hayAlgoMedioAlfil(true, posicion_antes, posicion_despues, tablero) == true) {
                         resultado = false;
                   }
             }
@@ -423,7 +589,7 @@ class AjedrezJuego {
             else if ((posicion_despues[X]
                         - posicion_antes[X]) == (posicion_antes[Y]
                                     - posicion_despues[Y])) {
-                  if (hayAlgoMedioAlfil(false, posicion_antes, posicion_despues) == true) {
+                  if (hayAlgoMedioAlfil(false, posicion_antes, posicion_despues, tablero) == true) {
                         resultado = false;
                   }
             }
@@ -434,7 +600,7 @@ class AjedrezJuego {
             return resultado;
       }
 
-      public boolean puedeMoverKing(int[] posicion_antes, int[] posicion_despues) {
+      public boolean puedeMoverKing(int[] posicion_antes, int[] posicion_despues, String[][] tablero) {
             boolean resultado = false;
             int distancia_x = posicion_despues[X] - posicion_antes[X];
             int distancia_y = posicion_despues[Y] - posicion_antes[Y];
@@ -447,7 +613,7 @@ class AjedrezJuego {
                   boolean a_derecha;
 
                   // blanco
-                  if (turno_jugador == true) {
+                  if (tablero[posicion_antes[X]][posicion_despues[Y]].charAt(0) == 'B') {
                         posicion_rey[X] = 4;
                         posicion_rey[Y] = 1;
                         // a la derecha
@@ -488,7 +654,7 @@ class AjedrezJuego {
                               a_derecha = false;
                         }
                   }
-                  if (puedeEnroque(a_derecha, posicion_rey, posicion_torre)) {
+                  if (puedeEnroque(a_derecha, posicion_rey, posicion_torre, tablero)) {
                         resultado = true;
                         enroqueMoverTorre(posicion_torre, posicion_torre_despues);
                   }
@@ -510,7 +676,7 @@ class AjedrezJuego {
             return resultado;
       }
 
-      public boolean hayAlgoMedioTorre(boolean esHorizontal, int[] posicion_antes, int[] posicion_despues) {
+      public boolean hayAlgoMedioTorre(boolean esHorizontal, int[] posicion_antes, int[] posicion_despues, String[][] tablero) {
             // en caso de torre: comprobar si hay otra pieza esta en el medio
             boolean resultado = false;
             if (esHorizontal == true) {
@@ -555,7 +721,7 @@ class AjedrezJuego {
             return resultado;
       }
 
-      public boolean hayAlgoMedioAlfil(boolean sube, int[] posicion_antes, int[] posicion_despues) {
+      public boolean hayAlgoMedioAlfil(boolean sube, int[] posicion_antes, int[] posicion_despues, String[][] tablero) {
             // en caso de alfil: comprobar si hay otra pieza esta en el medio
             boolean resultado = false;
             int distancia = posicion_despues[X] - posicion_antes[X];
@@ -610,42 +776,13 @@ class AjedrezJuego {
             return resultado;
       }
 
-      // coronacion
-      public boolean puedeCoronarPeon() {
-            boolean resultado = false;
-            if (tablero[posicion_movimiento_posterior[X]][posicion_movimiento_posterior[Y]].charAt(1) == 'P') {
-                  if (posicion_movimiento_posterior[Y] == 1 || posicion_movimiento_posterior[Y] == 8) {
-                        resultado = true;
-                  }
-            }
-            return resultado;
-      }
-
-      public void coronarPeon(char char_pieza) {// en caso de coronacion, cambiar el peon
-            tablero[posicion_movimiento_posterior[X]][posicion_movimiento_posterior[Y]] = ("" + color_jugador
-                        + char_pieza);
-      }
-
-      // cambio de piezas
-      public void moverPieza() {
-            // si mata, actualiza la eliminacion y puntos
-            if (tablero[posicion_movimiento_posterior[X]][posicion_movimiento_posterior[Y]] != "0") {
-                  actualizarEliminacion();
-                  actualizarPuntos(
-                              tablero[posicion_movimiento_posterior[X]][posicion_movimiento_posterior[Y]].charAt(1),
-                              false);
-            }
-            tablero[posicion_movimiento_posterior[X]][posicion_movimiento_posterior[Y]] = tablero[posicion_movimiento_anterior[X]][posicion_movimiento_anterior[Y]];
-            tablero[posicion_movimiento_anterior[X]][posicion_movimiento_anterior[Y]] = "0";
-      }
-
-      // enroque
-      public boolean puedeEnroque(boolean a_derecha, int[] posicion_rey, int[] posicion_torre) {
+      // puedeMoverKing - enroque
+      public boolean puedeEnroque(boolean a_derecha, int[] posicion_rey, int[] posicion_torre, String[][] tablero) {
             // ninguna pieza se movio
             // no hay piezas entre rey y torre
             // el rey des de principio hasta destino no puede estar en jaque
             boolean resultado = false;
-            if (enroqueNoMovido(a_derecha) == true && hayAlgoMedioTorre(true, posicion_rey, posicion_torre) == false
+            if (enroqueNoMovido(a_derecha) == true && hayAlgoMedioTorre(true, posicion_rey, posicion_torre, tablero) == false
                         && enroqueReyNoJaque(a_derecha) == true) {
                   resultado = true;
             }
@@ -713,14 +850,36 @@ class AjedrezJuego {
             tablero[posicion_antes[X]][posicion_antes[Y]] = "0";
       }
 
-      // end game
-      {
-            // 1. abandono
-            // 2. empate-ahogado
-            // 3. empate-muerto
-            // 4. jaqueMate
+      // movimiento - coronacion
+      public boolean puedeCoronarPeon() {
+            boolean resultado = false;
+            if (tablero[posicion_movimiento_posterior[X]][posicion_movimiento_posterior[Y]].charAt(1) == 'P') {
+                  if (posicion_movimiento_posterior[Y] == 1 || posicion_movimiento_posterior[Y] == 8) {
+                        resultado = true;
+                  }
+            }
+            return resultado;
       }
 
+      public void coronarPeon(char char_pieza) {// en caso de coronacion, cambiar el peon
+            tablero[posicion_movimiento_posterior[X]][posicion_movimiento_posterior[Y]] = ("" + color_jugador
+                        + char_pieza);
+      }
+
+      // movimeinto - mover piezas
+      public void moverPieza() {
+            // si mata, actualiza la eliminacion y puntos
+            if (tablero[posicion_movimiento_posterior[X]][posicion_movimiento_posterior[Y]] != "0") {
+                  actualizarEliminacion();
+                  actualizarPuntos(
+                              tablero[posicion_movimiento_posterior[X]][posicion_movimiento_posterior[Y]].charAt(1),
+                              false);
+            }
+            tablero[posicion_movimiento_posterior[X]][posicion_movimiento_posterior[Y]] = tablero[posicion_movimiento_anterior[X]][posicion_movimiento_anterior[Y]];
+            tablero[posicion_movimiento_anterior[X]][posicion_movimiento_anterior[Y]] = "0";
+      }
+
+      // gamePlay - end game
       public boolean endGame() {
             boolean resultado = false;
             int[] posicion_rey_jugador = posicion_rey_blanco_actual;
@@ -762,7 +921,6 @@ class AjedrezJuego {
       }
 
       public boolean empateAhogado() {
-            System.out.println("ahogado");
             return noPuedeMoverNada(color_jugador);
       }
 
@@ -777,16 +935,15 @@ class AjedrezJuego {
                         resultado = true;
                   }
                   // situacion 3 - BK y 
-                  else if (puntos_blanco == 36 && puntos_negro == 36 && colorCasilla(posicionPieza('B', 'A')) == colorCasilla(posicionPieza('N', 'A'))) {
+                  else if (puntos_blanco == 36 && puntos_negro == 36 && colorCasilla(posicionPieza('B', 'A', tablero)) == colorCasilla(posicionPieza('N', 'A', tablero))) {
                         resultado = true;
                   }
-                  System.out.println("muerto");
-
             return resultado;
       }
 
       public boolean noPuedeMoverNada(char player) {
             // el player no puede mover ninguna pieza suya a ninguna casilla, ya no puede hacer ningun movimiento
+            // se utiliza en caso de jaque-mate y empate-ahogado
             boolean resultado = true;
             for (int i = 1; i <= 8; i++) {
                   for (int j = 1; j <= 8; j++) {
@@ -798,7 +955,7 @@ class AjedrezJuego {
                                           int[] posicion_despues = { ii, jj };
 
                                           if (!esSuPieza(posicion_despues, player)) {
-                                                if (puedeMover(posicion_antes, posicion_despues, true)) {
+                                                if (puedeMover(posicion_antes, posicion_despues, true, tablero)) {
                                                       resultado = false;
                                                       break;      
                                                 }
@@ -820,7 +977,46 @@ class AjedrezJuego {
             return resultado;
       }
 
-      // funciones auxiliares
+      // movimiento - introducir posicion
+      public int[] introducirPosicion(String mensaje) { // introducir una posicion de tablero
+            int[] posicion = new int[2];
+            while (true) {
+                  System.out.print(mensaje);
+                  if (input.hasNext()) {
+                        String entrada = input.next();
+
+                        // abandono
+                        if (entrada.equals("abandono")) {
+                              juego_acabado = true;
+                              break;
+                        }
+
+                        // en caso de que el usuario ha introducido mas de un caracter, error
+                        if (entrada.length() > 1) {
+                              System.out.println("Error: entrada de X demasiado largo");
+                              input.nextLine();
+                              continue;
+                        }
+
+                        posicion[X] = (int)entrada.charAt(0) - 96; // X
+                        if (input.hasNextInt()) {
+                              posicion[Y] = input.nextInt(); // Y
+                              if (entreUnoOcho(posicion[X]) == true && entreUnoOcho(posicion[Y]) == true) {
+                                    input.nextLine();
+                                    break;
+                              } else {
+                                    System.out.println("Error: entrada fuera de rango (a-h y 1-8)");
+                                    input.nextLine();
+                              }
+                        } else {
+                              System.out.println("Error: entrada de Y no numerica");
+                              input.nextLine();
+                        }
+                  }
+            }
+            return posicion;
+      }
+
       public boolean entreUnoOcho(int n) { // comprobar si el numero es 1-8
             boolean resultado = true;
             if (n < 1 || n > 8)
@@ -834,39 +1030,6 @@ class AjedrezJuego {
                   resultado = false;
             }
             return resultado;
-      }
-
-      public int[] introducirPosicion(String mensaje) { // introducir una posicion de tablero
-            int[] posicion = new int[2];
-            while (true) {
-                  System.out.print(mensaje);
-                  if (input.hasNextInt()) {
-                        posicion[X] = input.nextInt();
-                        if (input.hasNextInt()) {
-                              posicion[Y] = input.nextInt();
-                              if (entreUnoOcho(posicion[X]) == true && entreUnoOcho(posicion[Y]) == true) {
-                                    input.nextLine();
-                                    break;
-                              } else {
-                                    System.out.println("Entrada Invalida1");
-                                    input.nextLine();
-                              }
-                        } else {
-                              System.out.println("Entrada Invalida2");
-                              input.nextLine();
-                        }
-                  } else {
-                        if (input.next().equals("abandono")) {
-                              juego_acabado = true;
-                              break;
-                        }
-                        else {
-                              System.out.println("Entrada Invalida3");
-                              input.nextLine();      
-                        }
-                  }
-            }
-            return posicion;
       }
 
       public char introducirPiezaCoronacion() { // en caso de coronacion, introducir char_pieza
@@ -885,15 +1048,13 @@ class AjedrezJuego {
       }
 
       public boolean jaque(char color_jugador_a, char color_jugador_b, int[] posicion_rey_b, String[][] tablero) {
-            // jugador_b esta en jaque (una pieza de jugador_a puede matar el rey de
-            // jugador_b)
-            // comprobar si el jugador ------jaque-----> el enemigo
+            // una pieza de A puede matar el rey de B en el tablero especificado
             boolean resultado = false;
             for (int i = 1; i <= 8; i++) {
                   for (int j = 1; j <= 8; j++) {
                         if (tablero[i][j].charAt(0) == color_jugador_a) {
                               int[] posicion_pieza_a = { i, j };
-                              if (puedeMover(posicion_pieza_a, posicion_rey_b, false)) {
+                              if (puedeMover(posicion_pieza_a, posicion_rey_b, false, tablero)) {
                                     resultado = true;
                                     break;
                               }
@@ -936,6 +1097,9 @@ class AjedrezJuego {
                         p = 9;
                         break;
             }
+
+            //
+            mensaje_puntos = p;
 
             // en caso de coronacion
             if (es_coronacion == true) {
@@ -1007,7 +1171,7 @@ class AjedrezJuego {
             return resultado;
       }
 
-      public int[] posicionPieza(char color_pieza, char nombre_pieza) {
+      public int[] posicionPieza(char color_pieza, char nombre_pieza, String[][] tablero) {
             // esta funcion busca la pieza que quieres encontrar
             // y devuelve la posicion de la primera que encuentra
             boolean break_hecho = false;
@@ -1026,5 +1190,22 @@ class AjedrezJuego {
                   }
             }
             return p;
+      }
+
+      public void guardarInfoMensaje() {
+            if (tablero[posicion_movimiento_posterior[X]][posicion_movimiento_posterior[Y]] != "0") {
+                  mensaje_accion = "matar";
+                  mensaje_pieza_matado = tablero[posicion_movimiento_posterior[X]][posicion_movimiento_posterior[Y]];
+            }
+            else {
+                  mensaje_accion = "mover";
+                  mensaje_pieza_matado = "";
+                  mensaje_puntos = 0;
+            }
+            mensaje_pieza_movido = tablero[posicion_movimiento_anterior[X]][posicion_movimiento_anterior[Y]];
+            mensaje_casilla_antes[X] = posicion_movimiento_anterior[X];
+            mensaje_casilla_antes[Y] = posicion_movimiento_anterior[Y];
+            mensaje_casilla_despues[X] = posicion_movimiento_posterior[X];
+            mensaje_casilla_despues[Y] = posicion_movimiento_posterior[Y];
       }
 }
