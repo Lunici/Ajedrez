@@ -20,13 +20,14 @@ class AjedrezJuego {
       public final int X = 0; // posicion[0]: X
       public final int Y = 1; // posicion[1]: Y
 
-      public int n_turno = 1;
+      public int n_turno = 1; // cada turno, n_turno++
       public boolean turno_jugador = true; // true: blanco false: negro
       public char color_jugador = 'B'; // 'B': blanco 'N': negro
       public char color_enemigo = 'N'; // 'B': blanco 'N': negro
-      public String nombre_blanco = "BLANCO";
+      public String nombre_blanco = "BLANCO"; // nombre de jugadores
       public String nombre_negro = "NEGRO";
-      public int[] posicion_rey_jugador = { 4, 1 }; 
+
+      public int[] posicion_rey_jugador = { 4, 1 };  // se actualiza cada turno en gamePlay()
       public int[] posicion_rey_blanco_actual = { 4, 1 }; // posicion de rey blanco
       public int[] posicion_rey_negro_actual = { 5, 8 }; // posicion de rey negro
       public int[] posicion_rey_blanco_inicio = { 4, 1 };
@@ -43,23 +44,23 @@ class AjedrezJuego {
       public int n_eliminado_blanco = 0;
       public int n_eliminado_negro = 0;
 
-      public boolean movido_rey_blanco = false;
+      public boolean movido_rey_blanco = false; // en caso de enroque, guardan si se han movido los torres y los reyes
       public boolean movido_torre_blanco_izq = false;
       public boolean movido_torre_blanco_der = false;
       public boolean movido_rey_negro = false;
       public boolean movido_torre_negro_izq = false;
       public boolean movido_torre_negro_der = false;
 
-      public boolean en_jaque_blanco = false;
+      public boolean en_jaque_blanco = false; // para saber si hace falta mostrar el mensaje "te has salvado"
       public boolean en_jaque_negro = false;
 
-      public String mensaje_accion;
-      public String mensaje_pieza_movido;
+      public String mensaje_accion; // "mover" o "matar"
+      public String mensaje_pieza_movido; // ej."BP"
       public String mensaje_pieza_matado;
       public int[] mensaje_casilla_antes = { -48, 0 }; // (char)(-48+96) == '0'
       public int[] mensaje_casilla_despues = { -48, 0 };
-      public int mensaje_puntos;
-      public String mensaje_aviso_blanco = "";
+      public int mensaje_puntos; // en caso de matar, guarda cuantos puntos ha conseguido el jugador
+      public String mensaje_aviso_blanco = ""; // "estas en jaque", "te has salvado" ...
       public String mensaje_aviso_negro = "";
 
       public boolean juego_acabado = false;
@@ -154,7 +155,7 @@ class AjedrezJuego {
                         }
                   }
                   if (y == 6) {
-                        System.out.print("Introducir \"abandono\" para rendirse");
+                        System.out.print("Introducir \"abandono\" para rendirse en cualquier momento");
                   }
                   if (y == 5) {
                         System.out.print("Ultimo paso:");
@@ -248,8 +249,12 @@ class AjedrezJuego {
             programa.gamePlay();
       }
 
-      // game play
+      // game play (introducirNombre - bucleTurno - endGame)
       public void gamePlay() {
+            // los jugadores se ponen nombres
+            nombre_blanco = introducirNombre("BLANCO");
+            nombre_negro = introducirNombre("NEGRO");
+
             // bucle de turno (blanco -> negro -> blanco -> ...)
             while (juego_acabado == false) {
                   if (turno_jugador == true) {
@@ -931,12 +936,25 @@ class AjedrezJuego {
                         resultado = true;
                   }
                   // situacion 2 - rey contra rey y alfil o rey contra rey y caballo
-                  else if ((puntos_blanco == 36 && puntos_negro == 39) || (puntos_blanco == 39 && puntos_negro == 36)) {
+                  // Explicacion: el negro solo tiene 2 piezas y el blanco tiene 36 puntos (39-3) o el blanco tiene 2 piezas y el negro tiene 36 puntos
+                  else if ((puntos_blanco == 36 && puntos_negro == 39 && n_eliminado_negro == 14) || (puntos_blanco == 39 && puntos_negro == 36 && n_eliminado_blanco == 14)) {
                         resultado = true;
                   }
-                  // situacion 3 - BK y 
-                  else if (puntos_blanco == 36 && puntos_negro == 36 && colorCasilla(posicionPieza('B', 'A', tablero)) == colorCasilla(posicionPieza('N', 'A', tablero))) {
-                        resultado = true;
+                  // situacion 3 - a cada jugador le quedan un rey y un alfil, y los alfiles estan en casilla de mismo color
+                  else if (puntos_blanco == 36 && puntos_negro == 36) {
+                        // comprobar si solo les quedan 2 piezas
+                        if (n_eliminado_blanco == 14 && n_eliminado_negro == 14) {
+                              // conseguir las posiciones del alfil (si existe), si no existe pues devuelve posicion {-1,-1}
+                              int[] posicion_alfil_blanco = posicionPieza('B', 'A', tablero);
+                              int[] posicion_alfil_negro = posicionPieza('N', 'A', tablero);
+                              // comprobar si las posiciones son validas (que no sean {-1,-1})
+                              if (posicionValida(posicion_alfil_blanco) == true && posicionValida(posicion_alfil_negro) == true) {
+                                    // si son de casilla de mismo color:
+                                    if (colorCasilla(posicion_alfil_blanco) == colorCasilla(posicion_alfil_negro)) {
+                                          resultado = true;
+                                    }
+                              }
+                        }
                   }
             return resultado;
       }
@@ -977,7 +995,7 @@ class AjedrezJuego {
             return resultado;
       }
 
-      // movimiento - introducir posicion
+      // movimiento - introducir posicion - entreUnoOcho/esSuPieza
       public int[] introducirPosicion(String mensaje) { // introducir una posicion de tablero
             int[] posicion = new int[2];
             while (true) {
@@ -1032,6 +1050,8 @@ class AjedrezJuego {
             return resultado;
       }
 
+
+      // movimiento - introducirPiezaCororacion
       public char introducirPiezaCoronacion() { // en caso de coronacion, introducir char_pieza
             char char_pieza;
 
@@ -1047,28 +1067,46 @@ class AjedrezJuego {
             return char_pieza;
       }
 
-      public boolean jaque(char color_jugador_a, char color_jugador_b, int[] posicion_rey_b, String[][] tablero) {
-            // una pieza de A puede matar el rey de B en el tablero especificado
-            boolean resultado = false;
-            for (int i = 1; i <= 8; i++) {
-                  for (int j = 1; j <= 8; j++) {
-                        if (tablero[i][j].charAt(0) == color_jugador_a) {
-                              int[] posicion_pieza_a = { i, j };
-                              if (puedeMover(posicion_pieza_a, posicion_rey_b, false, tablero)) {
-                                    resultado = true;
-                                    break;
-                              }
-                        }
+      // gamePlay - introducirNombre
+      public String introducirNombre(String nombre) {
+            String entrada;
+            while (true) {
+                  System.out.print("El jugador " + nombre + " se llama (por defecto " + nombre + "): ");
+                  entrada = input.nextLine();
+                  // si no ha introducido nada
+                  if (entrada.length() == 0) {
+                        entrada = nombre;
+                        break;
                   }
-                  if (resultado == true) {
+
+                  // si hay espacios
+                  else if (entrada.indexOf(' ') != -1) {
+                        System.out.println("Error: el nombre no puede contener espacios\n");
+                        continue;
+                  }
+
+                  // si es muy largo
+                  else if (entrada.length() > 8) {
+                        System.out.println("Error: demasiado largo (max 8 caracteres)\n");
+                        continue;
+                  }
+
+                  // si es muy corto
+                  else if (entrada.length() < 2) {
+                        System.out.println("Error: demasiado corto (min 2 caracteres)\n");
+                        continue;
+                  }
+
+                  // caso general
+                  else {
                         break;
                   }
             }
-            return resultado;
+            return entrada.toUpperCase();
       }
 
-      public void actualizarEliminacion() { // en caso de eliminacion, actualiza los arrays piezas_eliminadas y
-                                            // n_eliminados
+      // actualizar/guardar estados
+      public void actualizarEliminacion() { // en caso de eliminacion, actualiza los arrays piezas_eliminadas y n_eliminados
             if (turno_jugador == true) {
                   piezas_eliminadas_negro[n_eliminado_negro] = tablero[posicion_movimiento_posterior[X]][posicion_movimiento_posterior[Y]];
                   n_eliminado_negro++;
@@ -1155,6 +1193,24 @@ class AjedrezJuego {
             }
       }
 
+      public void guardarInfoMensaje() {
+            if (tablero[posicion_movimiento_posterior[X]][posicion_movimiento_posterior[Y]] != "0") {
+                  mensaje_accion = "matar";
+                  mensaje_pieza_matado = tablero[posicion_movimiento_posterior[X]][posicion_movimiento_posterior[Y]];
+            }
+            else {
+                  mensaje_accion = "mover";
+                  mensaje_pieza_matado = "";
+                  mensaje_puntos = 0;
+            }
+            mensaje_pieza_movido = tablero[posicion_movimiento_anterior[X]][posicion_movimiento_anterior[Y]];
+            mensaje_casilla_antes[X] = posicion_movimiento_anterior[X];
+            mensaje_casilla_antes[Y] = posicion_movimiento_anterior[Y];
+            mensaje_casilla_despues[X] = posicion_movimiento_posterior[X];
+            mensaje_casilla_despues[Y] = posicion_movimiento_posterior[Y];
+      }
+
+      // empateMuerto - situacion 3
       public boolean colorCasilla(int[] casilla) {
             // hay dos tipos de casillas (ej.blanco y negro)
             // se utiliza en caso de empateMuerto para comprobar si los alfiles son de mismo tipo de casilla
@@ -1174,8 +1230,9 @@ class AjedrezJuego {
       public int[] posicionPieza(char color_pieza, char nombre_pieza, String[][] tablero) {
             // esta funcion busca la pieza que quieres encontrar
             // y devuelve la posicion de la primera que encuentra
+            // si no encuentra nada, devuelve {-1, -1}
             boolean break_hecho = false;
-            int[] p = new int[2];
+            int[] p = {-1, -1};
             for (int i = 1; i <= 8; i++) {
                   for (int j = 1; j <= 8; j++) {
                         if (tablero[i][j].charAt(0) == color_pieza && tablero[i][j].charAt(1) == nombre_pieza) {
@@ -1192,20 +1249,33 @@ class AjedrezJuego {
             return p;
       }
 
-      public void guardarInfoMensaje() {
-            if (tablero[posicion_movimiento_posterior[X]][posicion_movimiento_posterior[Y]] != "0") {
-                  mensaje_accion = "matar";
-                  mensaje_pieza_matado = tablero[posicion_movimiento_posterior[X]][posicion_movimiento_posterior[Y]];
+      public boolean posicionValida(int[] posicion) {
+            boolean resultado = true;
+            if (entreUnoOcho(posicion[X]) == false || entreUnoOcho(posicion[Y]) == false) {
+                  resultado = false;
             }
-            else {
-                  mensaje_accion = "mover";
-                  mensaje_pieza_matado = "";
-                  mensaje_puntos = 0;
-            }
-            mensaje_pieza_movido = tablero[posicion_movimiento_anterior[X]][posicion_movimiento_anterior[Y]];
-            mensaje_casilla_antes[X] = posicion_movimiento_anterior[X];
-            mensaje_casilla_antes[Y] = posicion_movimiento_anterior[Y];
-            mensaje_casilla_despues[X] = posicion_movimiento_posterior[X];
-            mensaje_casilla_despues[Y] = posicion_movimiento_posterior[Y];
+            return resultado;
       }
+
+      // puedeMover/enroqueReyNoJaque/jaqueMate/noPuedeMoverNada --> jaque
+      public boolean jaque(char color_jugador_a, char color_jugador_b, int[] posicion_rey_b, String[][] tablero) {
+            // una pieza de A puede matar el rey de B en el tablero especificado
+            boolean resultado = false;
+            for (int i = 1; i <= 8; i++) {
+                  for (int j = 1; j <= 8; j++) {
+                        if (tablero[i][j].charAt(0) == color_jugador_a) {
+                              int[] posicion_pieza_a = { i, j };
+                              if (puedeMover(posicion_pieza_a, posicion_rey_b, false, tablero)) {
+                                    resultado = true;
+                                    break;
+                              }
+                        }
+                  }
+                  if (resultado == true) {
+                        break;
+                  }
+            }
+            return resultado;
+      }
+
 }
